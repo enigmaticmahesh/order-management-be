@@ -1,0 +1,14 @@
+# pnpm-workspace.yaml
+
+# # Tells pnpm your main NestJS app is the root target
+# packages:
+#   - '.'
+
+# Supply Chain Protection Configuration
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+
+# # Ensure NestJS ecosystem essentials skip the gate if you trust them
+# minimumReleaseAgeExclude:
+#   - '@nestjs/*'
+#   - 'typescript'
