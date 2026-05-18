@@ -6,6 +6,7 @@ import {
   integer,
   decimal,
   boolean,
+  date,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { subCats } from './subcats.schema';
@@ -18,8 +19,8 @@ export const products = pgTable('products', {
   mrp: decimal({ precision: 5, scale: 2 }).notNull(),
   price: decimal({ precision: 5, scale: 2 }).notNull(),
   qty: integer('qty').notNull(),
-  mfD: timestamp('manufactured_datetime', { withTimezone: true }).notNull(),
-  mexpD: timestamp('expiry_datetime', { withTimezone: true }).notNull(),
+  mfD: date('manufactured_date', { mode: 'string' }).notNull(),
+  expD: date('expiry_date', { mode: 'string' }).notNull(),
   sku: varchar({ length: 255 }).notNull().unique(),
   barCode: varchar('bar_code', { length: 255 }).notNull().unique(),
   isActive: boolean('is_active').default(true).notNull(),

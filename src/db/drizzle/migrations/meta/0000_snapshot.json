@@ -1,5 +1,5 @@
 {
-  "id": "7361cdb5-b539-4ea1-9760-db98d8b3721c",
+  "id": "c8af06fb-5da5-4fbc-9bf7-99c23d7851b8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -447,15 +447,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "manufactured_datetime": {
-          "name": "manufactured_datetime",
-          "type": "timestamp with time zone",
+        "manufactured_date": {
+          "name": "manufactured_date",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
-        "expiry_datetime": {
-          "name": "expiry_datetime",
-          "type": "timestamp with time zone",
+        "expiry_date": {
+          "name": "expiry_date",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
