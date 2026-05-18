@@ -9,17 +9,15 @@ import {
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import {
-  createDbHsnCode,
   CreateHsnCodeDTO,
   DeleteHsnCodeDTO,
   UpdateHsnCodeDTO,
 } from './hsncodes.dto';
-import { DbHsnCode } from './hsncodes.interface';
+import { HsnCode } from './hsncodes.interface';
 
 @Injectable()
 export class HsncodesService {
   private logger = new Logger(HsncodesService.name);
-  //   private readonly db: ReturnType<DrizzleService['getDb']>;
   constructor(private readonly ds: DrizzleService) {}
 
   private get db() {
@@ -29,8 +27,7 @@ export class HsncodesService {
   async createCode(hsnData: CreateHsnCodeDTO) {
     try {
       const { hsnCodes } = this.ds.getSchema();
-      const newHsnCode = createDbHsnCode(hsnData); // Drizzle saves sgst as a string in the DB
-      await this.db.insert(hsnCodes).values(newHsnCode);
+      await this.db.insert(hsnCodes).values(hsnData);
     } catch (err: any) {
       this.logger.error('Error while creating a new hsn code:', err);
       if (err.cause.code === '23505') {
@@ -40,7 +37,7 @@ export class HsncodesService {
     }
   }
 
-  async getCodes(): Promise<DbHsnCode[]> {
+  async getCodes(): Promise<HsnCode[]> {
     try {
       return this.db.query.hsnCodes.findMany();
     } catch (err) {
@@ -52,18 +49,11 @@ export class HsncodesService {
   async updateCode(hsnData: UpdateHsnCodeDTO) {
     try {
       const { hsnCodes } = this.ds.getSchema();
-
-      const newHsnCode = {} as DbHsnCode;
-      if (hsnData.code) {
-        newHsnCode.code = hsnData.code;
-      }
-      if (hsnData.sgst) {
-        newHsnCode.sgst = hsnData.sgst.toString();
-      }
+      const { id, ...newHsnCode } = hsnData;
       const [updatedCode] = await this.db
         .update(hsnCodes)
         .set(newHsnCode)
-        .where(eq(hsnCodes.id, hsnData.id))
+        .where(eq(hsnCodes.id, id))
         .returning();
       if (!updatedCode) {
         throw new NotFoundException('HSN code not found');

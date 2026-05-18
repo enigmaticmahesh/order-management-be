@@ -1,7 +1,14 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
-import { DbHsnCode, HsnCode } from './hsncodes.interface';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsNumberString,
+  IsString,
+  Min,
+} from 'class-validator';
+import { BadRequestException } from '@nestjs/common';
 
 export class CreateHsnCodeDTO {
   @IsNotEmpty({ message: 'HSN code cannot be empty' })
@@ -10,20 +17,24 @@ export class CreateHsnCodeDTO {
 
   @IsNotEmpty({ message: 'SGST cannot be empty' })
   @Transform(({ value }) => {
-    if (value === null || value === undefined || value === '') return undefined;
-    const parsed = Number(value);
-    // If it's an unparseable string like "abc", return original value so @IsNumber catches it
-    return Number.isNaN(parsed) ? value : parsed;
+    if (value === undefined || value === null || value === '') return value;
+
+    const parsedNumber = Number(value);
+    // If the input is malicious text like 'abc', return it as-is so @IsNumberString catches it
+    if (isNaN(parsedNumber)) return value;
+
+    if (parsedNumber < 0) {
+      throw new BadRequestException(`Price cannot be a negative number`);
+    }
+
+    return parsedNumber.toFixed(2); // Outputs format like "1200.00" or "99.95"
   })
-  @IsNumber(
-    { maxDecimalPlaces: 2 },
-    {
-      message:
-        'SGST must be a valid decimal number with up to 2 decimal places',
-    },
+  // 2. Validates that the final value remains a clean numeric string
+  @IsNumberString(
+    {},
+    { message: 'SGST must be a valid number or numeric string' },
   )
-  @Min(0, { message: 'SGST cannot be negative' })
-  sgst!: number;
+  sgst!: string;
 }
 
 export class DeleteHsnCodeDTO {
@@ -43,7 +54,3 @@ export class UpdateHsnCodeDTO extends IntersectionType(
   DeleteHsnCodeDTO,
   PartialType(CreateHsnCodeDTO),
 ) {}
-
-export const createDbHsnCode = (hsnCodeData: HsnCode): DbHsnCode => {
-  return { ...hsnCodeData, sgst: hsnCodeData.sgst.toString() };
-};
