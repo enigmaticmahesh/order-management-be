@@ -12,7 +12,7 @@ import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { UserService } from '@/user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { UserWithRole } from '@/user/interfaces/user.interface';
-import { TokenPayload } from '@/authcore/authcore.interface';
+import { TokenPayload } from '@/sharedcore/sharedcore.interface';
 
 @Injectable()
 export class AuthService {

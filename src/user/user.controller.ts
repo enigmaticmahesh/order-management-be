@@ -1,10 +1,10 @@
-import { AuthGuard } from '@/authcore/guards/auth.guard';
+import { AuthGuard } from '@/sharedcore/guards/auth.guard';
 import { Controller, Get, NotFoundException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDTO } from './user.dto';
 import { ApiResponseDTO } from '@/app.dto';
-import { CurrentUser } from '@/authcore/decorators/current-user.decorator';
-import { type TokenPayload } from '@/authcore/authcore.interface';
+import { CurrentUser } from '@/sharedcore/decorators/current-user.decorator';
+import { type TokenPayload } from '@/sharedcore/sharedcore.interface';
 
 @Controller('user')
 @UseGuards(AuthGuard)

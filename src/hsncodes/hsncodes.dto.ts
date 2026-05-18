@@ -1,6 +1,7 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Transform } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { DbHsnCode, HsnCode } from './hsncodes.interface';
 
 export class CreateHsnCodeDTO {
   @IsNotEmpty({ message: 'HSN code cannot be empty' })
@@ -42,46 +43,6 @@ export class UpdateHsnCodeDTO extends IntersectionType(
   DeleteHsnCodeDTO,
   PartialType(CreateHsnCodeDTO),
 ) {}
-
-// import { createZodDto } from 'nestjs-zod';
-// import { z } from 'zod';
-import { DbHsnCode, HsnCode } from './hsncodes.interface';
-
-// const createHsnCode = z.object({
-//   code: z
-//     .string({
-//       error: 'HSN code must be a string',
-//     })
-//     .trim() // ⚡ Highly Recommended: Removes leading/trailing whitespaces before checking length
-//     .min(1, { message: 'HSN code cannot be empty or just spaces' }),
-//   sgst: z
-//     .number({
-//       error: 'SGST must be a valid number',
-//     })
-//     .nonnegative({ error: 'SGST cannot be negative number' })
-//     .refine((value) => Number.isInteger(value * 100), {
-//       message: 'SGST cannot have more than 2 decimal places',
-//     }),
-// });
-
-// const deleteHsnCode = z.object({
-//   id: z.coerce
-//     .number({ error: 'id should be a number' })
-//     .positive({ error: 'id should be a positive number greater than 0' }),
-// });
-
-// const updateHsnCode = deleteHsnCode
-//   .extend(createHsnCode.partial().shape)
-//   .refine(
-//     ({ sgst, code }) => [sgst, code].some((value) => value !== undefined),
-//     {
-//       message: 'At least one field required',
-//     },
-//   );
-
-// export class CreateHsnCodeDTO extends createZodDto(createHsnCode) {}
-// export class UpdateHsnCodeDTO extends createZodDto(updateHsnCode) {}
-// export class DeleteHsnCodeDTO extends createZodDto(deleteHsnCode) {}
 
 export const createDbHsnCode = (hsnCodeData: HsnCode): DbHsnCode => {
   return { ...hsnCodeData, sgst: hsnCodeData.sgst.toString() };

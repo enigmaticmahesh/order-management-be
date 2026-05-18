@@ -4,16 +4,18 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@/authcore/guards/auth.guard';
+import { AuthGuard } from '@/sharedcore/guards/auth.guard';
 import { DeleteBrandDTO, BrandDTO, UpdateBrandDTO } from './brands.dto';
-import { AllowedRoles } from '@/authcore/decorators/allowed-roles.decorator';
-import { UserRole } from '@/authcore/authcore.interface';
-import { RolesGuard } from '@/authcore/guards/roles.guard';
+import { AllowedRoles } from '@/sharedcore/decorators/allowed-roles.decorator';
+import { UserRole } from '@/sharedcore/sharedcore.interface';
+import { RolesGuard } from '@/sharedcore/guards/roles.guard';
 import { BrandsService } from './brands.service';
+import { AtleastOneRequiredExceptID } from '@/sharedcore/pipes/atleast-one.pipe';
 
 @Controller('brands')
 @AllowedRoles(UserRole.ADMIN)
@@ -40,7 +42,7 @@ export class BrandsController {
 
   @Put()
   async updateBrand(
-    @Body() brandData: UpdateBrandDTO,
+    @Body(AtleastOneRequiredExceptID) brandData: UpdateBrandDTO,
   ): Promise<ApiResponseDTO> {
     await this.brandsService.updateBrand(brandData);
     return new ApiResponseDTO({
@@ -48,9 +50,9 @@ export class BrandsController {
     });
   }
 
-  @Delete()
+  @Delete(':id')
   async deleteBrand(
-    @Body() brandData: DeleteBrandDTO,
+    @Param() brandData: DeleteBrandDTO,
   ): Promise<ApiResponseDTO> {
     await this.brandsService.deleteBrand(brandData);
     return new ApiResponseDTO({

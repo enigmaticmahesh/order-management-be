@@ -1,24 +1,25 @@
 import { ApiResponseDTO } from '@/app.dto';
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@/authcore/guards/auth.guard';
-import { AllowedRoles } from '@/authcore/decorators/allowed-roles.decorator';
-import { UserRole } from '@/authcore/authcore.interface';
-import { RolesGuard } from '@/authcore/guards/roles.guard';
+import { AuthGuard } from '@/sharedcore/guards/auth.guard';
+import { AllowedRoles } from '@/sharedcore/decorators/allowed-roles.decorator';
+import { UserRole } from '@/sharedcore/sharedcore.interface';
+import { RolesGuard } from '@/sharedcore/guards/roles.guard';
 import { HsncodesService } from './hsncodes.service';
 import {
   CreateHsnCodeDTO,
   DeleteHsnCodeDTO,
   UpdateHsnCodeDTO,
 } from './hsncodes.dto';
+import { AtleastOneRequiredExceptID } from '@/sharedcore/pipes/atleast-one.pipe';
 
 @Controller('hsncodes')
 @AllowedRoles(UserRole.ADMIN)
@@ -47,20 +48,17 @@ export class HsncodesController {
 
   @Put()
   async updateCode(
-    @Body() codeData: UpdateHsnCodeDTO,
+    @Body(AtleastOneRequiredExceptID) codeData: UpdateHsnCodeDTO,
   ): Promise<ApiResponseDTO> {
-    if (Object.keys(codeData).length < 1) {
-      throw new BadRequestException('Atleast one of the field is required');
-    }
     await this.hsnService.updateCode(codeData);
     return new ApiResponseDTO({
       message: 'HSN code updated succesfully',
     });
   }
 
-  @Delete()
+  @Delete(':id')
   async deleteCode(
-    @Body() codeData: DeleteHsnCodeDTO,
+    @Param() codeData: DeleteHsnCodeDTO,
   ): Promise<ApiResponseDTO> {
     await this.hsnService.deleteCode(codeData);
     return new ApiResponseDTO({
