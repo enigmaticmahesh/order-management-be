@@ -1,21 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { configureRouting } from './configs/routing.config';
 
 // For validating DTOs
-const globalValidationPipe = () => {
+const globalValidationPipe = (app: INestApplication) => {
   const vp = new ValidationPipe({
     whitelist: true,
     transform: true,
     disableErrorMessages: false, // we should make it true in Production
     forbidNonWhitelisted: true,
   });
-  return vp;
+  app.useGlobalPipes(vp);
 };
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(globalValidationPipe());
+  configureRouting(app);
+  globalValidationPipe(app);
   app.enableShutdownHooks();
   const PORT = process.env.PORT ? Number(process.env.PORT) : undefined;
   await app.listen(PORT ?? 3001);
