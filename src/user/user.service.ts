@@ -1,6 +1,6 @@
 import { DrizzleService } from '@/db/drizzle/drizzle.service';
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { UserWithRole } from './interfaces/user.interface';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class UserService {
 
   async findUserByEmail(email: string): Promise<UserWithRole | undefined> {
     const user = await this.db.query.users.findFirst({
-      where: (user) => eq(user.email, email),
+      where: (user) => and(eq(user.email, email), eq(user.isActive, true)),
       with: {
         role: true,
       },
@@ -22,7 +22,7 @@ export class UserService {
 
   async findUserById(uid: string): Promise<UserWithRole | undefined> {
     const user = await this.db.query.users.findFirst({
-      where: (user) => eq(user.id, uid),
+      where: (user) => and(eq(user.id, uid), eq(user.isActive, true)),
       with: {
         role: true,
       },
