@@ -6,8 +6,8 @@ import {
 import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { ConfigService } from '@nestjs/config';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { join } from 'path';
+// import { migrate } from 'drizzle-orm/node-postgres/migrator';
+// import { join } from 'path';
 import * as schema from './schemas';
 
 @Injectable()
@@ -34,15 +34,15 @@ export class DrizzleService implements OnModuleInit, OnApplicationShutdown {
       'Database strategy initialized successfully using a config object.',
     );
 
-    // Automatically applies schema updates on application server startup! 🚀
-    await migrate(this.db, {
-      migrationsFolder: join(process.cwd(), 'src/db/drizzle/migrations'),
-      // migrationsSchema: 'public', // ◄ Tells NestJS: Look for it inside public
-      // migrationsTable: '__drizzle_migrations',
-    }).catch((err) => {
-      console.log('Programmatically migration error occured');
-      console.error({ err });
-    });
+    // // Automatically applies schema updates on application server startup! 🚀
+    // await migrate(this.db, {
+    //   migrationsFolder: join(process.cwd(), 'src/db/drizzle/migrations'),
+    //   // migrationsSchema: 'public', // ◄ Tells NestJS: Look for it inside public
+    //   // migrationsTable: '__drizzle_migrations',
+    // }).catch((err) => {
+    //   console.log('Programmatically migration error occured');
+    //   console.error({ err });
+    // });
   }
 
   getDb(): NodePgDatabase<typeof schema> {
