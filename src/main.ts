@@ -14,8 +14,29 @@ const globalValidationPipe = (app: INestApplication) => {
   app.useGlobalPipes(vp);
 };
 
+const handleCors = (app: INestApplication) => {
+  const origin =
+    process.env.MODE === 'DEV'
+      ? ['http://localhost:5173']
+      : [process.env.FRONTND_URL];
+  app.enableCors({
+    // 1. Specify your explicit frontend local or production origins
+    origin,
+
+    // 2. Allowed HTTP interaction verbs
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+
+    // 3. Allows Ky / Axios client token injection headers to pass through
+    allowedHeaders: ['Content-Type', 'Authorization'],
+
+    // // 4. Set to true if your authentication utilizes HttpOnly Cookies/Sessions
+    // credentials: true,
+  });
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  handleCors(app);
   configureRouting(app);
   globalValidationPipe(app);
   app.enableShutdownHooks();

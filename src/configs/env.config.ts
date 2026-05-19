@@ -9,6 +9,8 @@ const schema = Joi.object({
   DATABASE_USERNAME: Joi.string().required(),
   DATABASE_PASSWORD: Joi.string().required(),
   DATABASE_NAME: Joi.string().required(),
+  MODE: Joi.string().required(),
+  FRONTND_URL: Joi.string().required(),
 });
 
 export const EnvModule = ConfigModule.forRoot({
