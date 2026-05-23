@@ -7,10 +7,16 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@/sharedcore/guards/auth.guard';
-import { DeleteBrandDTO, BrandDTO, UpdateBrandDTO } from './brands.dto';
+import {
+  DeleteBrandDTO,
+  BrandDTO,
+  UpdateBrandDTO,
+  PaginatedBrandsQueryDTO,
+} from './brands.dto';
 import { AllowedRoles } from '@/sharedcore/decorators/allowed-roles.decorator';
 import { UserRole } from '@/sharedcore/sharedcore.interface';
 import { RolesGuard } from '@/sharedcore/guards/roles.guard';
@@ -24,11 +30,13 @@ export class BrandsController {
   constructor(private brandsService: BrandsService) {}
 
   @Get()
-  async getBrands(): Promise<ApiResponseDTO> {
-    const brands = await this.brandsService.getBrands();
+  async getBrands(
+    @Query() query: PaginatedBrandsQueryDTO,
+  ): Promise<ApiResponseDTO> {
+    const brandsData = await this.brandsService.getBrands(query);
     return new ApiResponseDTO({
       message: 'All the brands fetched succesfully',
-      data: brands,
+      data: brandsData,
     });
   }
 

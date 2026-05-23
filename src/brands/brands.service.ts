@@ -7,9 +7,15 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { BrandDTO, DeleteBrandDTO, UpdateBrandDTO } from './brands.dto';
-import { Brand } from './brands.interface';
+import { and, eq, gt, ilike, lt } from 'drizzle-orm';
+import {
+  BrandDTO,
+  DeleteBrandDTO,
+  PaginatedBrandsQueryDTO,
+  UpdateBrandDTO,
+} from './brands.dto';
+import { Brand, BrandsListResponse } from './brands.interface';
+import { DBQueryConfig } from 'drizzle-orm';
 
 @Injectable()
 export class BrandsService {
@@ -34,9 +40,85 @@ export class BrandsService {
     }
   }
 
-  async getBrands(): Promise<Brand[]> {
+  private _getConfig(query: PaginatedBrandsQueryDTO): DBQueryConfig {
+    const defaultConfig: DBQueryConfig = {
+      where: (brand) => {
+        return and(
+          query.cursor ? lt(brand.id, query.cursor) : undefined,
+          query.search ? ilike(brand.name, `%${query.search}%`) : undefined,
+        );
+      },
+      limit: query.limit + 1, // Fetch extra one row to check if there are more brands in the table
+      // offset: (query.page - 1) * query.limit,
+      orderBy: (brands, { desc }) => desc(brands.id),
+    };
+
+    if (query.dir === 'prev') {
+      defaultConfig.where = (brand) => {
+        // Moving Backward (Previous): Grab items with LARGER IDs than the current page start cursor.
+        // Sorted ascendingly to grab immediate physical neighbors near the boundary.
+        return and(
+          query.cursor ? gt(brand.id, query.cursor) : undefined,
+          query.search ? ilike(brand.name, `%${query.search}%`) : undefined,
+        );
+      };
+      defaultConfig.orderBy = (brands, { asc }) => asc(brands.id);
+    }
+    return defaultConfig;
+  }
+
+  private _brandsListResponse(
+    fetchedBrands: Brand[],
+    query: PaginatedBrandsQueryDTO,
+  ): BrandsListResponse {
+    const hasMore = fetchedBrands.length > query.limit;
+    const responseData: BrandsListResponse = {
+      nextID: 0,
+      firstID: 0,
+      hasNext: false,
+      hasPrev: false,
+      brands: fetchedBrands,
+    };
+
+    fetchedBrands = fetchedBrands.slice(0, query.limit); // Remove the extra row that we fetched to detect if there are more rows
+
+    // 2. Because moving backward (before) forces an ASC sort, the DB returns records reversed.
+    // We reverse them back to descending chronological order to maintain consistent presentation.
+    if (query.dir === 'prev') {
+      fetchedBrands = fetchedBrands.reverse();
+    }
+
+    if (fetchedBrands.length > 0) {
+      responseData.nextID = fetchedBrands[fetchedBrands.length - 1].id!;
+      responseData.firstID = fetchedBrands[0].id!;
+    }
+
+    switch (query.dir) {
+      case 'next':
+        responseData.hasNext = hasMore;
+        responseData.hasPrev = true;
+        break;
+      case 'prev':
+        responseData.hasNext = true;
+        responseData.hasPrev = hasMore;
+        break;
+      default:
+        responseData.hasNext = hasMore;
+        responseData.hasPrev = false;
+    }
+
+    responseData.brands = fetchedBrands;
+    return responseData;
+  }
+
+  async getBrands(query: PaginatedBrandsQueryDTO): Promise<BrandsListResponse> {
     try {
-      return this.db.query.brands.findMany();
+      const conditions: DBQueryConfig = this._getConfig(query);
+
+      const fetchedBrands = await this.db.query.brands.findMany(conditions);
+
+      const responseData = this._brandsListResponse(fetchedBrands, query);
+      return responseData;
     } catch (err) {
       this.logger.error('Error while fetching Brands:', err);
       throw new InternalServerErrorException('Failed to fetch Brands');

@@ -1,6 +1,7 @@
 // import { HttpStatus } from '@nestjs/common';
 
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class ApiResponseDTO<T = any> {
   //   statusCode: number;
@@ -24,4 +25,19 @@ export class ApiResponseDTO<T = any> {
     }
     // this.timestamp = new Date().toISOString();
   }
+}
+
+export class PaginationQueryDTO {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'Page number must be an integer' })
+  @Min(1, { message: 'Page number must be at least 1' })
+  page: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: 'Page limit must be an integer' })
+  @Min(1, { message: 'Page limit must be at least 1' })
+  @Max(100, { message: 'Page limit cannot exceed 100' })
+  limit: number = 10;
 }
