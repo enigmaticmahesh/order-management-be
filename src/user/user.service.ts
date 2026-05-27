@@ -1,7 +1,7 @@
 import { DrizzleService } from '@/db/drizzle/drizzle.service';
 import { Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { UserWithRole } from './interfaces/user.interface';
+import { UserFullData, UserWithRole } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -25,6 +25,18 @@ export class UserService {
       where: (user) => and(eq(user.id, uid), eq(user.isActive, true)),
       with: {
         role: true,
+      },
+    });
+    return user;
+  }
+
+  // Get full user data along with its profile and role
+  async findUserDataById(uid: string): Promise<UserFullData | undefined> {
+    const user = await this.db.query.users.findFirst({
+      where: (user) => and(eq(user.id, uid), eq(user.isActive, true)),
+      with: {
+        role: true,
+        profile: true,
       },
     });
     return user;

@@ -18,3 +18,12 @@ export interface UserWithRole {
   role: Role;
   createdAt: Date;
 }
+
+export interface UserProfile {
+  id: number;
+  name: string;
+}
+
+export interface UserFullData extends UserWithRole {
+  profile: UserProfile;
+}

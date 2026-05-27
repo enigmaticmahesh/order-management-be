@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { UserWithRole } from './interfaces/user.interface';
+import { UserFullData, UserWithRole } from './interfaces/user.interface';
 
 export class UserDTO {
   id: string;
@@ -14,5 +14,17 @@ export class UserDTO {
     this.id = user.id;
     this.email = user.email;
     this.role = user.role.name;
+  }
+}
+
+export class FullUserDTO extends UserDTO {
+  fullName: string;
+
+  constructor(user: UserFullData) {
+    super(user);
+    this.id = user.id;
+    this.email = user.email;
+    this.role = user.role.name;
+    this.fullName = user.profile.name;
   }
 }
