@@ -41,3 +41,8 @@ export class PaginationQueryDTO {
   @Max(100, { message: 'Page limit cannot exceed 100' })
   limit: number = 10;
 }
+
+export enum PaginationDirection {
+  NEXT = 'next',
+  PREV = 'prev',
+}

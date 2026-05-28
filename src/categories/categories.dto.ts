@@ -1,6 +1,16 @@
+import { PaginationDirection, PaginationQueryDTO } from '@/app.dto';
 import { IntersectionType } from '@nestjs/mapped-types';
-import { Transform } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class CategoryDTO {
   @IsNotEmpty({ message: 'Category name cannot be empty' })
@@ -25,3 +35,21 @@ export class UpdateCategoryDTO extends IntersectionType(
   DeleteCategoryDTO,
   CategoryDTO,
 ) {}
+
+export class PaginatedCategoriesQueryDTO extends PaginationQueryDTO {
+  @IsOptional()
+  @IsString({ message: 'Category name must be string' })
+  @MinLength(3, { message: 'Category name must be at least 3 characters long' })
+  search?: string;
+
+  @IsOptional()
+  @Type(() => Number) // Converts the incoming string query/param to a real number
+  @IsNumber()
+  cursor?: number; // This acts like a cursor, which will contain the last id or first id depending on the direction
+
+  @IsOptional()
+  @IsEnum(PaginationDirection, {
+    message: 'direction must be either "next" or "prev"',
+  })
+  dir?: PaginationDirection;
+}

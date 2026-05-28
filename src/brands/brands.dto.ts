@@ -1,4 +1,4 @@
-import { PaginationQueryDTO } from '@/app.dto';
+import { PaginationDirection, PaginationQueryDTO } from '@/app.dto';
 import { IntersectionType } from '@nestjs/mapped-types';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -35,11 +35,6 @@ export class UpdateBrandDTO extends IntersectionType(
   DeleteBrandDTO,
   BrandDTO,
 ) {}
-
-enum PaginationDirection {
-  NEXT = 'next',
-  PREV = 'prev',
-}
 export class PaginatedBrandsQueryDTO extends PaginationQueryDTO {
   @IsOptional()
   @IsString({ message: 'Brand name must be string' })

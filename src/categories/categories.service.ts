@@ -7,13 +7,16 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { Category } from './category.interface';
+import { and, eq, gt, ilike, lt } from 'drizzle-orm';
+import { Category, CatsListResponse } from './category.interface';
 import {
   CategoryDTO,
   DeleteCategoryDTO,
+  PaginatedCategoriesQueryDTO,
   UpdateCategoryDTO,
 } from './categories.dto';
+import { DBQueryConfig } from 'drizzle-orm';
+import { categories } from '@/db/drizzle/schemas';
 
 @Injectable()
 export class CategoriesService {
@@ -38,9 +41,86 @@ export class CategoriesService {
     }
   }
 
-  async getCategories(): Promise<Category[]> {
+  private _getConfig(query: PaginatedCategoriesQueryDTO): DBQueryConfig {
+    const defaultConfig: DBQueryConfig = {
+      where: (brand) => {
+        return and(
+          query.cursor ? lt(brand.id, query.cursor) : undefined,
+          query.search ? ilike(brand.name, `%${query.search}%`) : undefined,
+        );
+      },
+      limit: query.limit + 1, // Fetch extra one row to check if there are more brands in the table
+      // offset: (query.page - 1) * query.limit,
+      orderBy: (brands, { desc }) => desc(brands.id),
+    };
+
+    if (query.dir === 'prev') {
+      defaultConfig.where = (brand) => {
+        // Moving Backward (Previous): Grab items with LARGER IDs than the current page start cursor.
+        // Sorted ascendingly to grab immediate physical neighbors near the boundary.
+        return and(
+          query.cursor ? gt(brand.id, query.cursor) : undefined,
+          query.search ? ilike(brand.name, `%${query.search}%`) : undefined,
+        );
+      };
+      defaultConfig.orderBy = (brands, { asc }) => asc(brands.id);
+    }
+    return defaultConfig;
+  }
+
+  private _catsListResponse(
+    fetchedCats: Category[],
+    query: PaginatedCategoriesQueryDTO,
+  ): CatsListResponse {
+    const hasMore = fetchedCats.length > query.limit;
+    const responseData: CatsListResponse = {
+      nextID: 0,
+      firstID: 0,
+      hasNext: false,
+      hasPrev: false,
+      categories: fetchedCats,
+    };
+
+    fetchedCats = fetchedCats.slice(0, query.limit); // Remove the extra row that we fetched to detect if there are more rows
+
+    // 2. Because moving backward (before) forces an ASC sort, the DB returns records reversed.
+    // We reverse them back to descending chronological order to maintain consistent presentation.
+    if (query.dir === 'prev') {
+      fetchedCats = fetchedCats.reverse();
+    }
+
+    if (fetchedCats.length > 0) {
+      responseData.nextID = fetchedCats[fetchedCats.length - 1].id!;
+      responseData.firstID = fetchedCats[0].id!;
+    }
+
+    switch (query.dir) {
+      case 'next':
+        responseData.hasNext = hasMore;
+        responseData.hasPrev = true;
+        break;
+      case 'prev':
+        responseData.hasNext = true;
+        responseData.hasPrev = hasMore;
+        break;
+      default:
+        responseData.hasNext = hasMore;
+        responseData.hasPrev = false;
+    }
+
+    responseData.categories = fetchedCats;
+    return responseData;
+  }
+
+  async getCategories(
+    query: PaginatedCategoriesQueryDTO,
+  ): Promise<CatsListResponse> {
     try {
-      return this.db.query.categories.findMany();
+      const conditions: DBQueryConfig = this._getConfig(query);
+      const fetchedCats = await this.db.query.categories.findMany(conditions);
+      const responseData = this._catsListResponse(fetchedCats, query);
+
+      return responseData;
     } catch (err) {
       this.logger.error('Error while fetching Categories:', err);
       throw new InternalServerErrorException('Failed to fetch Categories');

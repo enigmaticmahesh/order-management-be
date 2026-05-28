@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@/sharedcore/guards/auth.guard';
@@ -18,6 +19,7 @@ import { CategoriesService } from './categories.service';
 import {
   CategoryDTO,
   DeleteCategoryDTO,
+  PaginatedCategoriesQueryDTO,
   UpdateCategoryDTO,
 } from './categories.dto';
 
@@ -28,11 +30,13 @@ export class CategoriesController {
   constructor(private catService: CategoriesService) {}
 
   @Get()
-  async getCategories(): Promise<ApiResponseDTO> {
-    const brands = await this.catService.getCategories();
+  async getCategories(
+    @Query() query: PaginatedCategoriesQueryDTO,
+  ): Promise<ApiResponseDTO> {
+    const categories = await this.catService.getCategories(query);
     return new ApiResponseDTO({
       message: 'All the categories fetched succesfully',
-      data: brands,
+      data: categories,
     });
   }
 
