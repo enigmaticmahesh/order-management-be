@@ -8,7 +8,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { DeleteSubCatDTO, SubCatDTO, UpdateSubCatDTO } from './subcat.dto';
+import {
+  CatIDDTO,
+  DeleteSubCatDTO,
+  SubCatDTO,
+  UpdateSubCatDTO,
+} from './subcat.dto';
 import { SubCat } from './subcat.interface';
 
 @Injectable()
@@ -36,7 +41,21 @@ export class SubcategoriesService {
 
   async getSubCats(): Promise<SubCat[]> {
     try {
-      return this.db.query.subCats.findMany();
+      return this.db.query.subCats.findMany({
+        orderBy: (subCats, { desc }) => desc(subCats.id),
+      });
+    } catch (err) {
+      this.logger.error('Error while fetching Sub Categories:', err);
+      throw new InternalServerErrorException('Failed to fetch Sub Categories');
+    }
+  }
+
+  async getSubCatsByCatId(catIdData: CatIDDTO): Promise<SubCat[]> {
+    try {
+      return this.db.query.subCats.findMany({
+        orderBy: (subCats, { desc }) => desc(subCats.id),
+        where: (subCat) => eq(subCat.catId, catIdData.catId),
+      });
     } catch (err) {
       this.logger.error('Error while fetching Sub Categories:', err);
       throw new InternalServerErrorException('Failed to fetch Sub Categories');

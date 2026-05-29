@@ -16,7 +16,6 @@ import {
   UpdateCategoryDTO,
 } from './categories.dto';
 import { DBQueryConfig } from 'drizzle-orm';
-import { categories } from '@/db/drizzle/schemas';
 
 @Injectable()
 export class CategoriesService {

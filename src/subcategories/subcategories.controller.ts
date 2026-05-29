@@ -15,7 +15,12 @@ import { UserRole } from '@/sharedcore/sharedcore.interface';
 import { RolesGuard } from '@/sharedcore/guards/roles.guard';
 import { AtleastOneRequiredExceptID } from '@/sharedcore/pipes/atleast-one.pipe';
 import { SubcategoriesService } from './subcategories.service';
-import { DeleteSubCatDTO, SubCatDTO, UpdateSubCatDTO } from './subcat.dto';
+import {
+  CatIDDTO,
+  DeleteSubCatDTO,
+  SubCatDTO,
+  UpdateSubCatDTO,
+} from './subcat.dto';
 
 @Controller('subcategories')
 @AllowedRoles(UserRole.ADMIN)
@@ -23,12 +28,23 @@ import { DeleteSubCatDTO, SubCatDTO, UpdateSubCatDTO } from './subcat.dto';
 export class SubcategoriesController {
   constructor(private subCatService: SubcategoriesService) {}
 
-  @Get()
-  async getSubCats(): Promise<ApiResponseDTO> {
-    const brands = await this.subCatService.getSubCats();
+  @Get(':catId')
+  async getSubCatsByCatId(
+    @Param() catIdData: CatIDDTO,
+  ): Promise<ApiResponseDTO> {
+    const subcats = await this.subCatService.getSubCatsByCatId(catIdData);
     return new ApiResponseDTO({
       message: 'All the sub categories fetched succesfully',
-      data: brands,
+      data: subcats,
+    });
+  }
+
+  @Get()
+  async getSubCats(): Promise<ApiResponseDTO> {
+    const subcats = await this.subCatService.getSubCats();
+    return new ApiResponseDTO({
+      message: 'All the sub categories fetched succesfully',
+      data: subcats,
     });
   }
 
