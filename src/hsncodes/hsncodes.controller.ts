@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@/sharedcore/guards/auth.guard';
@@ -17,6 +18,7 @@ import { HsncodesService } from './hsncodes.service';
 import {
   CreateHsnCodeDTO,
   DeleteHsnCodeDTO,
+  PaginatedHSNCodesQueryDTO,
   UpdateHsnCodeDTO,
 } from './hsncodes.dto';
 import { AtleastOneRequiredExceptID } from '@/sharedcore/pipes/atleast-one.pipe';
@@ -28,8 +30,10 @@ export class HsncodesController {
   constructor(private hsnService: HsncodesService) {}
 
   @Get()
-  async getCodes(): Promise<ApiResponseDTO> {
-    const codes = await this.hsnService.getCodes();
+  async getCodes(
+    @Query() query: PaginatedHSNCodesQueryDTO,
+  ): Promise<ApiResponseDTO> {
+    const codes = await this.hsnService.getCodes(query);
     return new ApiResponseDTO({
       message: 'All the codes fetched succesfully',
       data: codes,

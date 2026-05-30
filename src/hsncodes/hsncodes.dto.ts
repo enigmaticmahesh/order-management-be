@@ -1,14 +1,18 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
+  IsOptional,
   IsString,
   Min,
+  MinLength,
 } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
+import { PaginationDirection, PaginationQueryDTO } from '@/app.dto';
 
 export class CreateHsnCodeDTO {
   @IsNotEmpty({ message: 'HSN code cannot be empty' })
@@ -54,3 +58,21 @@ export class UpdateHsnCodeDTO extends IntersectionType(
   DeleteHsnCodeDTO,
   PartialType(CreateHsnCodeDTO),
 ) {}
+
+export class PaginatedHSNCodesQueryDTO extends PaginationQueryDTO {
+  @IsOptional()
+  @IsString({ message: 'HSN Code must be string' })
+  @MinLength(3, { message: 'HSN Code must be at least 3 characters long' })
+  code?: string;
+
+  @IsOptional()
+  @Type(() => Number) // Converts the incoming string query/param to a real number
+  @IsNumber()
+  cursor?: number; // This acts like a cursor, which will contain the last id or first id depending on the direction
+
+  @IsOptional()
+  @IsEnum(PaginationDirection, {
+    message: 'direction must be either "next" or "prev"',
+  })
+  dir?: PaginationDirection;
+}

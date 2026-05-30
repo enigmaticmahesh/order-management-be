@@ -3,3 +3,11 @@ export interface HsnCode {
   code: string;
   sgst: string;
 }
+
+export interface HSNCodesListResponse {
+  nextID: number;
+  firstID: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+  codes: HsnCode[];
+}
