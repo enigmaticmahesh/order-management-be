@@ -167,4 +167,18 @@ export class HsncodesService {
       throw new InternalServerErrorException('Failed to delete the HSN code');
     }
   }
+
+  async getAllCodes(): Promise<Omit<HsnCode, 'sgst'>[]> {
+    try {
+      const allCodes = await this.db.query.hsnCodes.findMany({
+        columns: { id: true, code: true },
+      });
+      return allCodes;
+    } catch (err) {
+      this.logger.error('Error while fetching all the Hsn codes:', err);
+      throw new InternalServerErrorException(
+        'Failed to fetch all the Hsn codes',
+      );
+    }
+  }
 }

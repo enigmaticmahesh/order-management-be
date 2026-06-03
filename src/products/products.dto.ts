@@ -2,36 +2,24 @@ import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Transform, Type } from 'class-transformer';
 import {
   IsDate,
+  IsEnum,
   IsInt,
   IsISO8601,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
+  IsOptional,
   IsString,
   Min,
+  MinLength,
 } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
+import { PaginationDirection, PaginationQueryDTO } from '@/app.dto';
 
 export class CreateProductDTO {
   @IsNotEmpty({ message: 'Product name cannot be empty' })
   @IsString({ message: 'Product name must be string' })
   name!: string;
-
-  //   @IsNotEmpty({ message: 'MRP cannot be empty' })
-  //   @Transform(({ value }) => {
-  //     if (value === null || value === undefined || value === '') return undefined;
-  //     const parsed = Number(value);
-  //     // If it's an unparseable string like "abc", return original value so @IsNumber catches it
-  //     return Number.isNaN(parsed) ? value : parsed;
-  //   })
-  //   @IsNumber(
-  //     { maxDecimalPlaces: 2 },
-  //     {
-  //       message: 'MRP must be a valid decimal number with up to 2 decimal places',
-  //     },
-  //   )
-  //   @Min(0, { message: 'MRP cannot be negative' })
-  //   mrp!: number;
 
   @IsNotEmpty({ message: 'MRP cannot be empty' })
   @Transform(({ value }) => {
@@ -54,22 +42,6 @@ export class CreateProductDTO {
   )
   mrp!: string;
 
-  //   @IsNotEmpty({ message: 'Price cannot be empty' })
-  //   @Transform(({ value }) => {
-  //     if (value === null || value === undefined || value === '') return undefined;
-  //     const parsed = Number(value);
-  //     // If it's an unparseable string like "abc", return original value so @IsNumber catches it
-  //     return Number.isNaN(parsed) ? value : parsed;
-  //   })
-  //   @IsNumber(
-  //     { maxDecimalPlaces: 2 },
-  //     {
-  //       message:
-  //         'Price must be a valid decimal number with up to 2 decimal places',
-  //     },
-  //   )
-  //   @Min(0, { message: 'Price cannot be negative' })
-  //   price!: number;
   @IsNotEmpty({ message: 'Price cannot be empty' })
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === '') return value;
@@ -190,3 +162,50 @@ export class UpdateProductDTO extends IntersectionType(
   DeleteProductDTO,
   PartialType(CreateProductDTO),
 ) {}
+
+export class PaginatedProductsQueryDTO extends PaginationQueryDTO {
+  @IsOptional()
+  @IsString({ message: 'Product name must be string' })
+  @MinLength(3, { message: 'Product name must be at least 3 characters long' })
+  name?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Product bar code must be string' })
+  @MinLength(3, {
+    message: 'Product bar code must be at least 3 characters long',
+  })
+  barCode?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Product SKU must be string' })
+  @MinLength(3, { message: 'Product SKU must be at least 3 characters long' })
+  sku?: string;
+
+  @IsOptional()
+  @IsString({ message: 'HSN code ID must be string' })
+  @MinLength(1, { message: 'HSN code ID must be at least 3 characters long' })
+  hsnId?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Brand ID must be string' })
+  @MinLength(1, { message: 'Brand ID must be at least 3 characters long' })
+  brandId?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Subcategory ID must be string' })
+  @MinLength(1, {
+    message: 'Subcategory ID must be at least 3 characters long',
+  })
+  subcatId?: string;
+
+  @IsOptional()
+  @Type(() => Number) // Converts the incoming string query/param to a real number
+  @IsNumber()
+  cursor?: number; // This acts like a cursor, which will contain the last id or first id depending on the direction
+
+  @IsOptional()
+  @IsEnum(PaginationDirection, {
+    message: 'direction must be either "next" or "prev"',
+  })
+  dir?: PaginationDirection;
+}

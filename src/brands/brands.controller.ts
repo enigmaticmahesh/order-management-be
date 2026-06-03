@@ -40,6 +40,15 @@ export class BrandsController {
     });
   }
 
+  @Get('all')
+  async getAllBrands(): Promise<ApiResponseDTO> {
+    const brandsData = await this.brandsService.getAllBrands();
+    return new ApiResponseDTO({
+      message: 'All the brands fetched succesfully',
+      data: brandsData,
+    });
+  }
+
   @Post()
   async createBrand(@Body() brandData: BrandDTO): Promise<ApiResponseDTO> {
     await this.brandsService.createBrand(brandData);

@@ -166,4 +166,16 @@ export class BrandsService {
       throw new InternalServerErrorException('Failed to delete the Brand');
     }
   }
+
+  async getAllBrands(): Promise<Brand[]> {
+    try {
+      const allBrands = await this.db.query.brands.findMany({
+        columns: { id: true, name: true },
+      });
+      return allBrands;
+    } catch (err) {
+      this.logger.error('Error while fetching all the Brands:', err);
+      throw new InternalServerErrorException('Failed to fetch all the Brands');
+    }
+  }
 }

@@ -40,6 +40,15 @@ export class HsncodesController {
     });
   }
 
+  @Get('all')
+  async getAllCodes(): Promise<ApiResponseDTO> {
+    const hsncodes = await this.hsnService.getAllCodes();
+    return new ApiResponseDTO({
+      message: 'All the codes fetched succesfully',
+      data: hsncodes,
+    });
+  }
+
   @Post()
   async createCode(
     @Body() codeData: CreateHsnCodeDTO,

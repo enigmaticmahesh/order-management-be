@@ -28,6 +28,15 @@ import {
 export class SubcategoriesController {
   constructor(private subCatService: SubcategoriesService) {}
 
+  @Get('all')
+  async getAllCodes(): Promise<ApiResponseDTO> {
+    const subcats = await this.subCatService.getAllSubcats();
+    return new ApiResponseDTO({
+      message: 'All the subcategories fetched succesfully',
+      data: subcats,
+    });
+  }
+
   @Get(':catId')
   async getSubCatsByCatId(
     @Param() catIdData: CatIDDTO,

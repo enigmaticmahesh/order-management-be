@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@/sharedcore/guards/auth.guard';
@@ -18,6 +19,7 @@ import { ProductsService } from './products.service';
 import {
   CreateProductDTO,
   DeleteProductDTO,
+  PaginatedProductsQueryDTO,
   UpdateProductDTO,
 } from './products.dto';
 
@@ -28,11 +30,13 @@ export class ProductsController {
   constructor(private prodService: ProductsService) {}
 
   @Get()
-  async getProducts(): Promise<ApiResponseDTO> {
-    const codes = await this.prodService.getProducts();
+  async getProducts(
+    @Query() query: PaginatedProductsQueryDTO,
+  ): Promise<ApiResponseDTO> {
+    const products = await this.prodService.getProducts(query);
     return new ApiResponseDTO({
       message: 'All the products fetched succesfully',
-      data: codes,
+      data: products,
     });
   }
 

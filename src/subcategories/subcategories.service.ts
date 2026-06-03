@@ -107,4 +107,18 @@ export class SubcategoriesService {
       );
     }
   }
+
+  async getAllSubcats(): Promise<Omit<SubCat, 'catId'>[]> {
+    try {
+      const subCats = await this.db.query.subCats.findMany({
+        columns: { id: true, name: true },
+      });
+      return subCats;
+    } catch (err) {
+      this.logger.error('Error while fetching all the Subcategories:', err);
+      throw new InternalServerErrorException(
+        'Failed to fetch all the Subcategories',
+      );
+    }
+  }
 }

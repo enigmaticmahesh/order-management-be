@@ -1,4 +1,4 @@
-export interface Product {
+interface Product {
   id?: number;
   name: string;
   mrp: string;
@@ -11,4 +11,27 @@ export interface Product {
   hsnId: number;
   brandId: number;
   subcatId: number;
+}
+
+export interface ProductWithLevelOneRelation extends Product {
+  hsnCode: {
+    id: number;
+    code: string;
+  };
+  brand: {
+    id: number;
+    name: string;
+  };
+  subCat: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface ProductsListResponse {
+  nextID: number;
+  firstID: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+  products: ProductWithLevelOneRelation[];
 }
