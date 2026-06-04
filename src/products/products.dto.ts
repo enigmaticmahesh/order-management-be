@@ -1,7 +1,6 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Transform, Type } from 'class-transformer';
 import {
-  IsDate,
   IsEnum,
   IsInt,
   IsISO8601,
