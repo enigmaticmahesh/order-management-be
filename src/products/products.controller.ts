@@ -85,10 +85,10 @@ export class ProductsController {
 
   @Get('get-files-count')
   async getFilesCount(@Query() query: FolderPathDTO): Promise<ApiResponseDTO> {
-    const count = await this.prodService.getFilesCount(query.path);
+    const files = await this.prodService.getFilesCount(query.path);
     return new ApiResponseDTO({
       message: 'Product files count fetched succesfully',
-      data: { count },
+      data: { files },
     });
   }
 }
