@@ -12,6 +12,7 @@ import {
   CreateProductDTO,
   DeleteProductDTO,
   PaginatedProductsQueryDTO,
+  ProductURLDTO,
   UpdateProductDTO,
 } from './products.dto';
 import {
@@ -19,11 +20,15 @@ import {
   ProductWithLevelOneRelation,
 } from './products.interface';
 import { DBQueryConfig } from 'drizzle-orm';
+import ImageKitService from '@/sharedcore/services/file-uploader/ImageKit.service';
 
 @Injectable()
 export class ProductsService {
   private logger = new Logger(ProductsService.name);
-  constructor(private readonly ds: DrizzleService) {}
+  constructor(
+    private readonly ds: DrizzleService,
+    private readonly imgKitService: ImageKitService,
+  ) {}
 
   private get db() {
     return this.ds.getDb();
@@ -32,7 +37,11 @@ export class ProductsService {
   async createProduct(productData: CreateProductDTO) {
     try {
       const { products } = this.ds.getSchema();
-      await this.db.insert(products).values(productData);
+      const [product] = await this.db
+        .insert(products)
+        .values(productData)
+        .returning();
+      return product;
     } catch (err: any) {
       this.logger.error('Error while creating a new product:', err);
       if (err.cause.code === '23505') {
@@ -196,6 +205,23 @@ export class ProductsService {
         throw err;
       }
       throw new InternalServerErrorException('Failed to delete the Product');
+    }
+  }
+
+  generateProductImgUploadURLs(data: ProductURLDTO) {
+    const urlsData = this.imgKitService.generateSignedURLs(data.count);
+    return urlsData;
+  }
+
+  async getFilesCount(folderPath: string) {
+    try {
+      return await this.imgKitService.filesCountOfFolder(folderPath);
+    } catch (err) {
+      this.logger.error('Unable to fetch the files count from ImageKit', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+      throw new InternalServerErrorException('Failed to get the files count');
     }
   }
 }

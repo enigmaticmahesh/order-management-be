@@ -9,6 +9,7 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  Matches,
   Min,
   MinLength,
 } from 'class-validator';
@@ -207,4 +208,34 @@ export class PaginatedProductsQueryDTO extends PaginationQueryDTO {
     message: 'direction must be either "next" or "prev"',
   })
   dir?: PaginationDirection;
+}
+
+export class ProductURLDTO {
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === null || value === undefined || value === '') return undefined;
+    const parsed = Number(value);
+    // If it's an unparseable string like "abc", return original value so @IsNumber catches it
+    return Number.isNaN(parsed) ? value : parsed;
+  })
+  @IsNumber(
+    {},
+    {
+      message: 'URL count must be a valid non decimal number',
+    },
+  )
+  @Min(1, { message: 'URL count cannot be less than 1' })
+  count: number = 1;
+}
+
+export class FolderPathDTO {
+  @IsString({ message: 'Product folder path must be string' })
+  @IsNotEmpty({ message: 'Folder path cannot be empty' })
+  @MinLength(2, {
+    message: 'Product folder path must be at least 3 characters long',
+  })
+  @Matches(/^\//, {
+    message: 'The folder path must start with a forward slash (/)',
+  })
+  path!: string;
 }

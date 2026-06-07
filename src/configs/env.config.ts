@@ -11,6 +11,8 @@ const schema = Joi.object({
   DATABASE_NAME: Joi.string().required(),
   MODE: Joi.string().required(),
   FRONTEND_URL: Joi.string().required(),
+  IMAGEKIT_PRIVATE_KEY: Joi.string().required(),
+  IMAGEKIT_PUBLIC_KEY: Joi.string().required(),
 });
 
 export const EnvModule = ConfigModule.forRoot({

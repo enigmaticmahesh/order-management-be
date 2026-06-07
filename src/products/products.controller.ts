@@ -19,7 +19,9 @@ import { ProductsService } from './products.service';
 import {
   CreateProductDTO,
   DeleteProductDTO,
+  FolderPathDTO,
   PaginatedProductsQueryDTO,
+  ProductURLDTO,
   UpdateProductDTO,
 } from './products.dto';
 
@@ -44,9 +46,11 @@ export class ProductsController {
   async createProduct(
     @Body() codeData: CreateProductDTO,
   ): Promise<ApiResponseDTO> {
-    await this.prodService.createProduct(codeData);
+    const { id, sku, barCode } = await this.prodService.createProduct(codeData);
+    const data = { id, sku, barCode };
     return new ApiResponseDTO({
       message: 'Product created succesfully',
+      data,
     });
   }
 
@@ -67,6 +71,24 @@ export class ProductsController {
     await this.prodService.deleteProduct(codeData);
     return new ApiResponseDTO({
       message: 'Product deleted succesfully',
+    });
+  }
+
+  @Get('gen-upload-urls')
+  async getUploadURLs(@Query() query: ProductURLDTO): Promise<ApiResponseDTO> {
+    const urlData = this.prodService.generateProductImgUploadURLs(query);
+    return new ApiResponseDTO({
+      message: 'All the products fetched succesfully',
+      data: urlData,
+    });
+  }
+
+  @Get('get-files-count')
+  async getFilesCount(@Query() query: FolderPathDTO): Promise<ApiResponseDTO> {
+    const count = await this.prodService.getFilesCount(query.path);
+    return new ApiResponseDTO({
+      message: 'Product files count fetched succesfully',
+      data: { count },
     });
   }
 }
