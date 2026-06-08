@@ -224,4 +224,16 @@ export class ProductsService {
       throw new InternalServerErrorException('Failed to get the files count');
     }
   }
+
+  async deleteProductImages(fileIds: string[]) {
+    try {
+      return await this.imgKitService.deleteFiles(fileIds);
+    } catch (err) {
+      this.logger.error('Unable to delete the files from ImageKit', err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+      throw new InternalServerErrorException('Failed to delete files');
+    }
+  }
 }

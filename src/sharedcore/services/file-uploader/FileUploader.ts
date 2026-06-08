@@ -63,7 +63,6 @@
 // processDocument(oneDrive, "report.pdf");
 export default abstract class FileUploader {
   abstract generateSignedURLs(urlCount: number): any;
-  abstract filesCountOfFolder(
-    folderPath: string,
-  ): Promise<{ name: string | undefined }[]>;
+  abstract filesCountOfFolder(folderPath: string): Promise<any[]>;
+  // ): Promise<{ name: string | undefined }[]>;
 }

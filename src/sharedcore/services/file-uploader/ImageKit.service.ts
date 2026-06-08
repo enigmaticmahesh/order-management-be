@@ -38,15 +38,30 @@ export default class ImageKitService extends FileUploader {
     return { urls, pubKey: this.publicKey };
   }
 
-  async filesCountOfFolder(
-    folderPath: string,
-  ): Promise<{ name: string | undefined }[]> {
+  async filesCountOfFolder(folderPath: string): Promise<any[]> {
     const res = await this.client.assets.list({
       fileType: 'image',
       limit: 6,
       path: folderPath,
       type: 'file',
     });
-    return res.map((file) => ({ name: file.name }));
+    return res.map((file: any) => ({
+      name: file.name,
+      url: file.url,
+      thumbnail: file.thumbnail,
+      fileId: file.fileId,
+    }));
+  }
+
+  async deleteFiles(fileIds: string[]): Promise<any> {
+    return await this.client.files.bulk.delete({
+      fileIds,
+    });
+    // return res.map((file: any) => ({
+    //   name: file.name,
+    //   url: file.url,
+    //   thumbnail: file.thumbnail,
+    //   fileId: file.fileId,
+    // }));
   }
 }

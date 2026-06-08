@@ -18,6 +18,7 @@ import { AtleastOneRequiredExceptID } from '@/sharedcore/pipes/atleast-one.pipe'
 import { ProductsService } from './products.service';
 import {
   CreateProductDTO,
+  DeleteImagesDTO,
   DeleteProductDTO,
   FolderPathDTO,
   PaginatedProductsQueryDTO,
@@ -51,6 +52,16 @@ export class ProductsController {
     return new ApiResponseDTO({
       message: 'Product created succesfully',
       data,
+    });
+  }
+
+  @Post('delete-images')
+  async deleteProductImages(
+    @Body() data: DeleteImagesDTO,
+  ): Promise<ApiResponseDTO> {
+    await this.prodService.deleteProductImages(data.fileIds);
+    return new ApiResponseDTO({
+      message: 'Product images deleted succesfully',
     });
   }
 

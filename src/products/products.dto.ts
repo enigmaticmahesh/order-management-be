@@ -1,6 +1,8 @@
 import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsEnum,
   IsInt,
   IsISO8601,
@@ -238,4 +240,15 @@ export class FolderPathDTO {
     message: 'The folder path must start with a forward slash (/)',
   })
   path!: string;
+}
+
+export class DeleteImagesDTO {
+  @IsArray({ message: 'Image IDs must be an array' })
+  @ArrayNotEmpty({ message: 'Image IDs array cannot be empty' }) // Ensures array has >= 1 item
+  @IsString({ each: true, message: 'Each individual ID must be a string' }) // 👈 Crucial configuration
+  @IsNotEmpty({
+    each: true,
+    message: 'Image IDs cannot contain empty string values',
+  }) // Optional: Rejects "" inside array
+  fileIds!: string[];
 }
