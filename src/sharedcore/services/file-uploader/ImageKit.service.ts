@@ -57,11 +57,11 @@ export default class ImageKitService extends FileUploader {
     return await this.client.files.bulk.delete({
       fileIds,
     });
-    // return res.map((file: any) => ({
-    //   name: file.name,
-    //   url: file.url,
-    //   thumbnail: file.thumbnail,
-    //   fileId: file.fileId,
-    // }));
+  }
+
+  async deleteFolder(folderPath: string): Promise<any> {
+    return await this.client.folders.delete({
+      folderPath,
+    });
   }
 }

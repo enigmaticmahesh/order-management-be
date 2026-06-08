@@ -193,14 +193,24 @@ export class ProductsService {
   async deleteProduct(productData: DeleteProductDTO) {
     try {
       const { products } = this.ds.getSchema();
-      const res = await this.db
-        .delete(products)
-        .where(eq(products.id, productData.id));
-      if (res.rowCount === 0) {
-        throw new NotFoundException('Product not found');
-      }
+
+      await this.db.transaction(async (tx) => {
+        const res = await tx
+          .delete(products)
+          .where(eq(products.id, productData.id))
+          .returning({ sku: products.sku, id: products.id });
+
+        if (res.length === 0) {
+          throw new NotFoundException('Product not found');
+        }
+
+        const [{ sku, id }] = res;
+        const folderPath = `/products/product_${sku}_${id}`;
+        await this.imgKitService.deleteFolder(folderPath);
+      });
     } catch (err: any) {
       this.logger.error('Error while deleting the Product:', err);
+
       if (err instanceof HttpException) {
         throw err;
       }
