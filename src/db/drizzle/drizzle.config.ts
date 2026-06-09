@@ -1,6 +1,6 @@
 import { defineConfig } from 'drizzle-kit';
 import { isDrizzleDataValid } from './drizzle.validation';
-import { join } from 'path';
+// import { join } from 'path';
 
 const validatedEnv = isDrizzleDataValid();
 
@@ -8,10 +8,10 @@ const url = `postgresql://${validatedEnv.DATABASE_USERNAME}:${validatedEnv.DATAB
 
 export default defineConfig({
   dialect: 'postgresql',
-  schema: join(process.cwd(), 'src/db/drizzle/schemas/index.ts'),
-  out: join(process.cwd(), 'src/db/drizzle/migrations'),
-  // schema: './src/db/drizzle/schemas/index.ts',
-  // out: './src/db/drizzle/migrations',
+  // schema: join(process.cwd(), 'src/db/drizzle/schemas/index.ts'),
+  // out: join(process.cwd(), 'src/db/drizzle/migrations'),
+  schema: './src/db/drizzle/schemas/index.ts',
+  out: './src/db/drizzle/migrations',
   // Instruct the CLI to keep the tracking table inside public 🚀
   //   migrations: {
   //     table: '__drizzle_migrations',

@@ -21,6 +21,7 @@ import {
 } from './products.interface';
 import { DBQueryConfig } from 'drizzle-orm';
 import ImageKitService from '@/sharedcore/services/file-uploader/ImageKit.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ProductsService {
@@ -28,6 +29,7 @@ export class ProductsService {
   constructor(
     private readonly ds: DrizzleService,
     private readonly imgKitService: ImageKitService,
+    private readonly configService: ConfigService,
   ) {}
 
   private get db() {
@@ -205,7 +207,11 @@ export class ProductsService {
         }
 
         const [{ sku, id }] = res;
-        const folderPath = `/products/product_${sku}_${id}`;
+        const mainFolder =
+          this.configService.get('MODE') === 'DEV'
+            ? 'products_dev'
+            : 'products_live';
+        const folderPath = `/${mainFolder}/product_${sku}_${id}`;
         await this.imgKitService.deleteFolder(folderPath);
       });
     } catch (err: any) {
