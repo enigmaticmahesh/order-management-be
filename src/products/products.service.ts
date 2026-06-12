@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { and, eq, gt, ilike, lt } from 'drizzle-orm';
 import {
@@ -20,17 +21,24 @@ import {
   ProductWithLevelOneRelation,
 } from './products.interface';
 import { DBQueryConfig } from 'drizzle-orm';
-import ImageKitService from '@/sharedcore/services/file-uploader/ImageKit.service';
 import { ConfigService } from '@nestjs/config';
+import { FileUploaderService } from '@/sharedcore/services/file-uploader/FileUploader.service';
+import { IFileUploader } from '@/sharedcore/services/file-uploader/file-uploader.interface';
 
 @Injectable()
-export class ProductsService {
+export class ProductsService implements OnModuleInit {
   private logger = new Logger(ProductsService.name);
+  private uploader!: IFileUploader;
+
   constructor(
     private readonly ds: DrizzleService,
-    private readonly imgKitService: ImageKitService,
+    private readonly uploaderService: FileUploaderService,
     private readonly configService: ConfigService,
   ) {}
+
+  onModuleInit() {
+    this.uploader = this.uploaderService.getUploader('imagekit');
+  }
 
   private get db() {
     return this.ds.getDb();
@@ -212,7 +220,7 @@ export class ProductsService {
             ? 'products_dev'
             : 'products_live';
         const folderPath = `/${mainFolder}/product_${sku}_${id}`;
-        await this.imgKitService.deleteFolder(folderPath);
+        await this.uploader.deleteFolder(folderPath);
       });
     } catch (err: any) {
       this.logger.error('Error while deleting the Product:', err);
@@ -225,13 +233,13 @@ export class ProductsService {
   }
 
   generateProductImgUploadURLs(data: ProductURLDTO) {
-    const urlsData = this.imgKitService.generateSignedURLs(data.count);
+    const urlsData = this.uploader.generateSignedURLs(data.count);
     return urlsData;
   }
 
   async getFilesCount(folderPath: string) {
     try {
-      return await this.imgKitService.filesCountOfFolder(folderPath);
+      return await this.uploader.filesCountOfFolder(folderPath);
     } catch (err) {
       this.logger.error('Unable to fetch the files count from ImageKit', err);
       if (err instanceof HttpException) {
@@ -243,7 +251,7 @@ export class ProductsService {
 
   async deleteProductImages(fileIds: string[]) {
     try {
-      return await this.imgKitService.deleteFiles(fileIds);
+      return await this.uploader.deleteFiles(fileIds);
     } catch (err) {
       this.logger.error('Unable to delete the files from ImageKit', err);
       if (err instanceof HttpException) {

@@ -1,21 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import FileUploader from './FileUploader';
 import { ConfigService } from '@nestjs/config';
 import ImageKit from '@imagekit/nodejs';
-
-type ImageKitSignedURLObject = {
-  token: string;
-  expire: number;
-  signature: string;
-};
+// import { IFileUploader } from './FileUploader';
+import {
+  IFileUploader,
+  ImageKitSignedURLObject,
+} from './file-uploader.interface';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export default class ImageKitService extends FileUploader {
+export class ImageKitUploader implements IFileUploader {
   private publicKey: string;
   private client: ImageKit;
 
   constructor(private readonly configService: ConfigService) {
-    super();
     /*
         1. Added "!" as we are validating the keys before starting the app
         2. If the key is not present in the environment, the app will not start
@@ -26,19 +23,18 @@ export default class ImageKitService extends FileUploader {
     });
   }
 
-  generateSignedURLs(urlCount: number = 1): {
-    urls: ImageKitSignedURLObject[];
-    pubKey: string;
-  } {
+  generateSignedURLs<ImageKitSignedUrlsResult>(urlCount: number = 1) {
     const urls: ImageKitSignedURLObject[] = [];
     for (let i = 0; i < urlCount; i++) {
       const url = this.client.helper.getAuthenticationParameters();
       urls.push(url);
     }
-    return { urls, pubKey: this.publicKey };
+    return { urls, pubKey: this.publicKey } as ImageKitSignedUrlsResult;
   }
 
-  async filesCountOfFolder(folderPath: string): Promise<any[]> {
+  async filesCountOfFolder<ImageKitFiles>(
+    folderPath: string,
+  ): Promise<ImageKitFiles[]> {
     const res = await this.client.assets.list({
       fileType: 'image',
       limit: 6,
@@ -50,7 +46,7 @@ export default class ImageKitService extends FileUploader {
       url: file.url,
       thumbnail: file.thumbnail,
       fileId: file.fileId,
-    }));
+    })) as ImageKitFiles[];
   }
 
   async deleteFiles(fileIds: string[]): Promise<any> {

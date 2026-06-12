@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-import ImageKitService from './services/file-uploader/ImageKit.service';
+import { FileUploaderService } from './services/file-uploader/FileUploader.service';
+import { ImageKitUploader } from './services/file-uploader/ImageKit.uploader';
 
 @Global()
 @Module({
-  providers: [ImageKitService],
-  exports: [ImageKitService],
+  providers: [FileUploaderService, ImageKitUploader],
+  exports: [FileUploaderService],
 })
 export class SharedCoreModule {}
