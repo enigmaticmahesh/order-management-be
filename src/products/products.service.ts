@@ -23,22 +23,16 @@ import {
 import { DBQueryConfig } from 'drizzle-orm';
 import { ConfigService } from '@nestjs/config';
 import { FileUploaderService } from '@/sharedcore/services/file-uploader/FileUploader.service';
-import { IFileUploader } from '@/sharedcore/services/file-uploader/file-uploader.interface';
 
 @Injectable()
-export class ProductsService implements OnModuleInit {
+export class ProductsService {
   private logger = new Logger(ProductsService.name);
-  private uploader!: IFileUploader;
 
   constructor(
     private readonly ds: DrizzleService,
     private readonly uploaderService: FileUploaderService,
     private readonly configService: ConfigService,
   ) {}
-
-  onModuleInit() {
-    this.uploader = this.uploaderService.getUploader('imagekit');
-  }
 
   private get db() {
     return this.ds.getDb();
@@ -220,7 +214,7 @@ export class ProductsService implements OnModuleInit {
             ? 'products_dev'
             : 'products_live';
         const folderPath = `/${mainFolder}/product_${sku}_${id}`;
-        await this.uploader.deleteFolder(folderPath);
+        await this.uploaderService.deleteFolder(folderPath);
       });
     } catch (err: any) {
       this.logger.error('Error while deleting the Product:', err);
@@ -233,13 +227,13 @@ export class ProductsService implements OnModuleInit {
   }
 
   generateProductImgUploadURLs(data: ProductURLDTO) {
-    const urlsData = this.uploader.generateSignedURLs(data.count);
+    const urlsData = this.uploaderService.generateSignedURLs(data.count);
     return urlsData;
   }
 
   async getFilesCount(folderPath: string) {
     try {
-      return await this.uploader.filesCountOfFolder(folderPath);
+      return await this.uploaderService.filesCountOfFolder(folderPath);
     } catch (err) {
       this.logger.error('Unable to fetch the files count from ImageKit', err);
       if (err instanceof HttpException) {
@@ -251,7 +245,7 @@ export class ProductsService implements OnModuleInit {
 
   async deleteProductImages(fileIds: string[]) {
     try {
-      return await this.uploader.deleteFiles(fileIds);
+      return await this.uploaderService.deleteFiles(fileIds);
     } catch (err) {
       this.logger.error('Unable to delete the files from ImageKit', err);
       if (err instanceof HttpException) {
