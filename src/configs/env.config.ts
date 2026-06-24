@@ -4,15 +4,17 @@ import Joi from 'joi';
 const schema = Joi.object({
   JWT_SECRET: Joi.string().required(),
   JWT_REFRESH_SECRET: Joi.string().required(),
-  DATABASE_HOST: Joi.string().required(),
-  DATABASE_PORT: Joi.string().required(),
-  DATABASE_USERNAME: Joi.string().required(),
-  DATABASE_PASSWORD: Joi.string().required(),
-  DATABASE_NAME: Joi.string().required(),
+  // DATABASE_HOST: Joi.string().required(),
+  // DATABASE_PORT: Joi.string().required(),
+  // DATABASE_USERNAME: Joi.string().required(),
+  // DATABASE_PASSWORD: Joi.string().required(),
+  // DATABASE_NAME: Joi.string().required(),
   MODE: Joi.string().required(),
   FRONTEND_URL: Joi.string().required(),
   IMAGEKIT_PRIVATE_KEY: Joi.string().required(),
   IMAGEKIT_PUBLIC_KEY: Joi.string().required(),
+  PROD_DATABASE_URL: Joi.string().required(),
+  DEV_DATABASE_URL: Joi.string().required(),
 });
 
 export const EnvModule = ConfigModule.forRoot({

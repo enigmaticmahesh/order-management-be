@@ -4,7 +4,11 @@ import { isDrizzleDataValid } from './drizzle.validation';
 
 const validatedEnv = isDrizzleDataValid();
 
-const url = `postgresql://${validatedEnv.DATABASE_USERNAME}:${validatedEnv.DATABASE_PASSWORD}@${validatedEnv.DATABASE_HOST}:${validatedEnv.DATABASE_PORT}/${validatedEnv.DATABASE_NAME}`;
+// const url = `postgresql://${validatedEnv.DATABASE_USERNAME}:${validatedEnv.DATABASE_PASSWORD}@${validatedEnv.DATABASE_HOST}:${validatedEnv.DATABASE_PORT}/${validatedEnv.DATABASE_NAME}`;
+const url =
+  validatedEnv.MODE === 'DEV'
+    ? validatedEnv.DEV_DATABASE_URL
+    : validatedEnv.PROD_DATABASE_URL;
 
 export default defineConfig({
   dialect: 'postgresql',
@@ -25,5 +29,6 @@ export default defineConfig({
     // database: validatedEnv.DATABASE_NAME,
     // url is needed for cli migrate command to work,
     url,
+    ssl: validatedEnv.MODE === 'DEV' ? false : true,
   },
 });

@@ -7,11 +7,14 @@ export const isDrizzleDataValid = () => {
 
   // 2. Define your explicit Environment Schema Contract
   const envSchema = Joi.object({
-    DATABASE_HOST: Joi.string().required(),
-    DATABASE_PORT: Joi.string().required(),
-    DATABASE_USERNAME: Joi.string().required(),
-    DATABASE_PASSWORD: Joi.string().required(),
-    DATABASE_NAME: Joi.string().required(),
+    // DATABASE_HOST: Joi.string().required(),
+    // DATABASE_PORT: Joi.string().required(),
+    // DATABASE_USERNAME: Joi.string().required(),
+    // DATABASE_PASSWORD: Joi.string().required(),
+    // DATABASE_NAME: Joi.string().required(),
+    PROD_DATABASE_URL: Joi.string().required(),
+    DEV_DATABASE_URL: Joi.string().required(),
+    MODE: Joi.string().required(),
   }).unknown(); // ◄ .unknown() prevents Joi from crashing on OS-injected variables
 
   // 3. Execute the validation sweep against the live process context

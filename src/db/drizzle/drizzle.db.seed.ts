@@ -6,12 +6,18 @@ import { isDrizzleDataValid } from './drizzle.validation';
 async function main() {
   console.log('🌱 Starting database seeding...');
   const validatedEnv = isDrizzleDataValid();
+  const connectionString =
+    validatedEnv.MODE === 'DEV'
+      ? validatedEnv.DEV_DATABASE_URL
+      : validatedEnv.PROD_DATABASE_URL;
   const pool = new Pool({
-    host: validatedEnv.DATABASE_HOST,
-    port: Number(validatedEnv.DATABASE_PORT),
-    user: validatedEnv.DATABASE_USERNAME,
-    password: validatedEnv.DATABASE_PASSWORD,
-    database: validatedEnv.DATABASE_NAME,
+    // host: validatedEnv.DATABASE_HOST,
+    // port: Number(validatedEnv.DATABASE_PORT),
+    // user: validatedEnv.DATABASE_USERNAME,
+    // password: validatedEnv.DATABASE_PASSWORD,
+    // database: validatedEnv.DATABASE_NAME,
+    connectionString,
+    ssl: validatedEnv.MODE === 'DEV' ? false : true,
   });
   const db = drizzle(pool, { schema });
 

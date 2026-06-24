@@ -18,12 +18,18 @@ export class DrizzleService implements OnModuleInit, OnApplicationShutdown {
   constructor(private configService: ConfigService) {}
 
   async onModuleInit() {
+    const connectionString =
+      this.configService.get<string>('MODE') === 'DEV'
+        ? this.configService.get<string>('DEV_DATABASE_URL')
+        : this.configService.get<string>('PROD_DATABASE_URL');
     this.pool = new Pool({
-      host: this.configService.get<string>('DATABASE_HOST'),
-      port: Number(this.configService.get<string>('DATABASE_PORT')),
-      user: this.configService.get<string>('DATABASE_USERNAME'),
-      password: this.configService.get<string>('DATABASE_PASSWORD'),
-      database: this.configService.get<string>('DATABASE_NAME'),
+      // host: this.configService.get<string>('DATABASE_HOST'),
+      // port: Number(this.configService.get<string>('DATABASE_PORT')),
+      // user: this.configService.get<string>('DATABASE_USERNAME'),
+      // password: this.configService.get<string>('DATABASE_PASSWORD'),
+      // database: this.configService.get<string>('DATABASE_NAME'),
+      connectionString,
+      ssl: this.configService.get<string>('MODE') === 'DEV' ? false : true,
       max: 10, // Keep your explicit connection pool cap for the Admin backend
       idleTimeoutMillis: 30000, // Closes idle connections after 30 seconds
       connectionTimeoutMillis: 2000, // Crash quickly if the DB server is down
