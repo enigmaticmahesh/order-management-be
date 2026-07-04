@@ -72,7 +72,7 @@ export class ProductsService {
       },
       limit: query.limit + 1, // Fetch extra one row to check if there are more brands in the table
       // offset: (query.page - 1) * query.limit,
-      orderBy: (brands, { desc }) => desc(brands.id),
+      orderBy: (products, { desc }) => desc(products.id),
     };
 
     if (query.dir === 'prev') {
@@ -167,6 +167,45 @@ export class ProductsService {
     } catch (err) {
       this.logger.error('Error while fetching Products:', err);
       throw new InternalServerErrorException('Failed to fetch Products');
+    }
+  }
+
+  async getDiscountedProducts(): Promise<ProductWithLevelOneRelation[]> {
+    try {
+      // const conditions: DBQueryConfig = this._getConfig(query);
+      const fetchedProds = await this.db.query.products.findMany({
+        // ...conditions,
+        with: {
+          hsnCode: {
+            columns: {
+              id: true,
+              code: true,
+            },
+          },
+          brand: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+          subCat: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        limit: 10,
+        orderBy: (products, { desc }) => desc(products.id),
+      });
+      // const responseData = this._prodsListResponse(fetchedProds);
+
+      return fetchedProds;
+    } catch (err) {
+      this.logger.error('Error while fetching discounted Products:', err);
+      throw new InternalServerErrorException(
+        'Failed to fetch discounted Products',
+      );
     }
   }
 
