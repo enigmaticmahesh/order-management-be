@@ -20,7 +20,7 @@ const handleCors = (app: INestApplication) => {
   const origin =
     process.env.MODE === 'DEV'
       ? ['http://localhost:5173', 'http://localhost:5174']
-      : [process.env.FRONTEND_URL];
+      : [process.env.FRONTEND_URL, process.env.STORE_URL];
   app.enableCors({
     // 1. Specify your explicit frontend local or production origins
     origin,
