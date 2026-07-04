@@ -86,7 +86,7 @@ export class ProductsController {
   }
 
   @Get('gen-upload-urls')
-  async getUploadURLs(@Query() query: ProductURLDTO): Promise<ApiResponseDTO> {
+  getUploadURLs(@Query() query: ProductURLDTO): ApiResponseDTO {
     const urlData = this.prodService.generateProductImgUploadURLs(query);
     return new ApiResponseDTO({
       message: 'All the products fetched succesfully',
