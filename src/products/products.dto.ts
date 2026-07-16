@@ -252,7 +252,7 @@ export class DeleteImagesDTO {
   }) // Optional: Rejects "" inside array
   fileIds!: string[];
 }
-export class ProductResponseDTO {
+export class ProductDetailsParamDTO {
   @Type(() => Number)
   @IsNotEmpty({ message: 'Product id cannot be empty' })
   @Transform(({ value }) => {

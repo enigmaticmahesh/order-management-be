@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Param } from '@nestjs/common';
-import { PaginatedProductsQueryDTO, ProductResponseDTO } from './products.dto';
+import { PaginatedProductsQueryDTO, ProductDetailsParamDTO } from './products.dto';
 import { ApiResponseDTO } from '@/app.dto';
 import { ProductsService } from './products.service';
 
@@ -38,7 +38,7 @@ export class StoreProductsController {
 
   @Get(':id')
   async getProductById(
-    @Param() params: ProductResponseDTO,
+    @Param() params: ProductDetailsParamDTO,
   ): Promise<ApiResponseDTO> {
     const product = await this.prodService.getProductById(params.id);
 
