@@ -133,6 +133,12 @@ export class ProductsService {
     return responseData;
   }
 
+  private _productResponse(
+    product: ProductWithLevelOneRelation,
+  ): ProductWithLevelOneRelation {
+    return product;
+  }
+
   async getProducts(
     query: PaginatedProductsQueryDTO,
   ): Promise<ProductsListResponse> {
@@ -291,6 +297,51 @@ export class ProductsService {
         throw err;
       }
       throw new InternalServerErrorException('Failed to delete files');
+    }
+  }
+
+  async getProductById(id: number) {
+    try {
+      const { products } = this.ds.getSchema();
+      const product = await this.db.query.products.findFirst({
+        where: eq(products.id, id),
+        with: {
+          hsnCode: {
+            columns: {
+              id: true,
+              code: true,
+            },
+          },
+          brand: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+          subCat: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+  
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+  
+      return this._productResponse(product);
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        throw err;
+      }
+  
+      this.logger.error('Error while fetching Product:', err);
+  
+      throw new InternalServerErrorException(
+        'Failed to fetch Product',
+      );
     }
   }
 }

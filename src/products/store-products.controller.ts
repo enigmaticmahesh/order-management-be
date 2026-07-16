@@ -1,5 +1,5 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { PaginatedProductsQueryDTO } from './products.dto';
+import { Controller, Get, Query, Param } from '@nestjs/common';
+import { PaginatedProductsQueryDTO, ProductResponseDTO } from './products.dto';
 import { ApiResponseDTO } from '@/app.dto';
 import { ProductsService } from './products.service';
 
@@ -33,6 +33,18 @@ export class StoreProductsController {
     return new ApiResponseDTO({
       message: 'All the popular products fetched succesfully',
       data: products,
+    });
+  }
+
+  @Get(':id')
+  async getProductById(
+    @Param() params: ProductResponseDTO,
+  ): Promise<ApiResponseDTO> {
+    const product = await this.prodService.getProductById(params.id);
+
+    return new ApiResponseDTO({
+      message: 'Product fetched successfully',
+      data: product,
     });
   }
 }
