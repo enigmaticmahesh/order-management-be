@@ -6,6 +6,7 @@ import { DbModule } from './db/db.module';
 import { SharedCoreModule } from './sharedcore/sharedcore.module';
 import { MyModules } from './app-modules.config';
 import { JwtModule } from '@nestjs/jwt';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({ global: true }),
     SharedCoreModule,
     ...MyModules,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],
