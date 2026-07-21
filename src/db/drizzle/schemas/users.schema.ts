@@ -11,6 +11,7 @@ import {
 import { roles } from './roles.schema';
 import { relations } from 'drizzle-orm';
 import { userProfiles } from './user-profile.schema';
+import { cartItems } from './cart-items.schema';
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -31,7 +32,7 @@ export const users = pgTable('users', {
 });
 
 // User perspective relation goes here
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfiles, {
     fields: [users.id],
     references: [userProfiles.userId],
@@ -40,4 +41,5 @@ export const usersRelations = relations(users, ({ one }) => ({
     fields: [users.roleId],
     references: [roles.id],
   }),
+  cartItems: many(cartItems)
 }));

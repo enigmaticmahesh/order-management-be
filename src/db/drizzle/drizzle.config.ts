@@ -1,6 +1,5 @@
 import { defineConfig } from 'drizzle-kit';
 import { isDrizzleDataValid } from './drizzle.validation';
-// import { join } from 'path';
 
 const validatedEnv = isDrizzleDataValid();
 
@@ -22,12 +21,6 @@ export default defineConfig({
   //     schema: 'public',
   //   },
   dbCredentials: {
-    // host: validatedEnv.DATABASE_HOST,
-    // port: Number(validatedEnv.DATABASE_PORT),
-    // user: validatedEnv.DATABASE_USERNAME,
-    // password: validatedEnv.DATABASE_PASSWORD,
-    // database: validatedEnv.DATABASE_NAME,
-    // url is needed for cli migrate command to work,
     url,
     ssl: validatedEnv.MODE === 'DEV' ? false : true,
   },

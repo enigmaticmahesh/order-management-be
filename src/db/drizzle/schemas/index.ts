@@ -6,3 +6,4 @@ export * from './hsn-codes.scheam';
 export * from './categories.schema';
 export * from './subcats.schema';
 export * from './products.schema';
+export * from './cart-items.schema';

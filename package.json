@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:generate": "pnpm drizzle-kit generate --config=src/db/drizzle/drizzle.config.ts",
-    "db:migrate": "pnpm drizzle-kit migrate --config=src/db/drizzle/drizzle.config.ts",
+    "db:migrate_old": "pnpm drizzle-kit migrate --config=src/db/drizzle/drizzle.config.ts",
+    "db:migrate": "pnpm dlx tsx src/db/drizzle/drizzle.db.migrate.ts",
     "db:seed": "pnpm dlx tsx src/db/drizzle/drizzle.db.seed.ts"
   },
   "dependencies": {
